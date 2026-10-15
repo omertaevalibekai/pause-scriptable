@@ -62,8 +62,9 @@ function makeWidget(operations, family = 'medium', parameter = '') {
   const state = PauseCore.reduce(operations), summary = PauseCore.summary(state), now = new Date();
   const widget = new ListWidget(); widget.backgroundColor = new Color(NIGHT.background); widget.setPadding(12, 14, 10, 14);
   widget.url = runURL();
-  // This is a requested earliest refresh, not a promise of an immediate update.
-  widget.refreshAfterDate = new Date(Date.now() + 5 * 60000);
+  // Eligible now: do not impose an extra five-minute floor after a saved entry.
+  // iOS still chooses when the Home Screen actually redraws this widget.
+  widget.refreshAfterDate = now;
   if (parameter === 'pause') {
     widget.url = runURL('craving');
     widget.addSpacer();
@@ -177,6 +178,8 @@ async function main() {
   }
   Script.setWidget(makeWidget(operations));
   await dashboard(operations, query.action === 'craving' ? 'craving' : 'today', message);
+  // Re-read after the sheet closes, then finish with the latest saved snapshot.
+  Script.setWidget(makeWidget(store.read()));
 }
 try { await main(); }
 catch (error) {
