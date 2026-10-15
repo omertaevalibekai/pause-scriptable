@@ -19,6 +19,7 @@ Desktop.ini
 # Private usage history and backups must never be committed
 PauseData-v1/
 **/PauseData-v1/
+**/PauseUpdates-v1/
 Pause-backup-*
 **/Pause-backup-*
 backups/
@@ -30,5 +31,5 @@ tmp/
 *.tmp
 *.zip
 
-# Pause.js, Preview.html, and Install.html are intentional distributables.
+# Pause.js, Pause-Auto.js, Preview.html, and Install.html are intentional distributables.
 # Keep them tracked; CI checks they match the source.

@@ -1,13 +1,13 @@
 {
   "name": "pause-personal-tracker",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.3",
   "private": true,
   "license": "MIT",
   "engines": { "node": ">=22" },
   "description": "Offline tobacco tracking for Scriptable on iPhone",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node --test tests/core.test.cjs tests/scriptable.test.cjs",
+    "test": "node --test tests/core.test.cjs tests/scriptable.test.cjs tests/autoupdate.test.cjs",
     "check:build": "node scripts/build.mjs --check",
     "check": "node --check src/core.js && node --check src/app.js && node --check scripts/build.mjs && node --check scripts/serve.mjs && npm run check:build && npm test",
     "start": "node scripts/serve.mjs"
