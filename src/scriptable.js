@@ -79,9 +79,10 @@ function makeWidget(operations, family = 'medium', parameter = '') {
   text(heading, (summary.today.stick + summary.today.cigarette) + ' today', 11, NIGHT.secondary);
   widget.addSpacer();
   if (summary.last) {
-    // Native relative text can advance between widget refreshes; do not bake a stale "42m" into the image.
+    // A numeric native timer keeps advancing without localized words like "мин.".
+    // WidgetDate has no per-element locale override for relative-style text.
     const last = widget.addStack(); last.addSpacer();
-    const date = last.addDate(new Date(summary.last.occurredAt)); date.applyRelativeStyle();
+    const date = last.addDate(new Date(summary.last.occurredAt)); date.applyTimerStyle();
     date.font = Font.semiboldSystemFont(family === 'large' ? 46 : 32); date.textColor = new Color(NIGHT.primary);
     date.lineLimit = 1; date.minimumScaleFactor = 0.65; last.addSpacer();
     centeredText(widget, 'since last entry', 11, NIGHT.secondary);
