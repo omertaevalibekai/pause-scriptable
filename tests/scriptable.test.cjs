@@ -15,7 +15,7 @@ function host(files = new Map(), query = {}, family = null, parameter = '', brid
     addStack() { const n = new Node(); this.children.push(n); return n; }
     addImage() { return new Node(); }
     addDate(value) { const n = new Node(); n.date = value; this.children.push(n); return n; }
-    applyRelativeStyle() { this.relative = true; } setPadding() {} addSpacer() {} centerAlignContent() {} layoutVertically() {}
+    applyTimerStyle() { this.timer = true; } setPadding() {} addSpacer() {} centerAlignContent() {} layoutVertically() {}
     async presentMedium() {}
   }
   const fm = {
@@ -77,7 +77,7 @@ test('widget links launch correct action; app run saves before opening dashboard
   const reopen = host(files); await reopen.run(); assert.equal(readLogs(files).length, 1);
 });
 
-test('Night widget shows real product counts and a native relative date without adding entries', async () => {
+test('Night widget shows real product counts and a numeric native timer without adding entries', async () => {
   const files = new Map();
   await host(files, { action: 'log', product: 'stick' }).run();
   await host(files, { action: 'log', product: 'stick' }).run();
@@ -93,7 +93,7 @@ test('Night widget shows real product counts and a native relative date without 
   }
   const date = h.nodes.find(n => n.date);
   assert.equal(date.date.toISOString(), readLogs(files)[0].occurredAt);
-  assert.equal(date.relative, true);
+  assert.equal(date.timer, true);
   assert.deepEqual([...files], before);
 });
 
