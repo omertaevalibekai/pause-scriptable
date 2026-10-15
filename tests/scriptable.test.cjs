@@ -13,8 +13,9 @@ function host(files = new Map(), query = {}, family = null, parameter = '', brid
     constructor() { this.children = []; nodes.push(this); }
     addText(value) { const n = new Node(); n.text = value; this.children.push(n); return n; }
     addStack() { const n = new Node(); this.children.push(n); return n; }
-    addImage() { return new Node(); } addDate() { return new Node(); }
-    applyRelativeStyle() {} setPadding() {} addSpacer() {} centerAlignContent() {}
+    addImage() { return new Node(); }
+    addDate(value) { const n = new Node(); n.date = value; this.children.push(n); return n; }
+    applyRelativeStyle() { this.relative = true; } setPadding() {} addSpacer() {} centerAlignContent() {} layoutVertically() {}
     async presentMedium() {}
   }
   const fm = {
@@ -47,11 +48,21 @@ function host(files = new Map(), query = {}, family = null, parameter = '', brid
     config: { runsInWidget: family !== null, widgetFamily: family },
     args: { queryParameters: query, widgetParameter: parameter }, WebView,
     ShareSheet: { async present() {} },
+    Request: class { async loadString() { throw new Error('Offline'); } },
     Alert: class { addAction() {} async presentAlert() { alerts.push(this.message); } }
   };
-  return { async run() { await vm.runInNewContext('(async()=>{' + script + '\n})()', sandbox); }, files, nodes, html, alerts, widgets, replies };
+  return { async run(source = script) { await vm.runInNewContext('(async()=>{' + source + '\n})()', sandbox); }, files, nodes, html, alerts, widgets, replies };
 }
 const readLogs = files => C.reduce([...files].filter(([p]) => p.endsWith('.json')).map(([, v]) => JSON.parse(v))).logs;
+
+test('generated auto launcher renders the bundled Night widget offline with the real host code', async () => {
+  const auto = fs.readFileSync(path.join(__dirname, '../Pause-Auto.js'), 'utf8');
+  const h = host(new Map(), {}, 'medium'); await h.run(auto);
+  assert.equal(h.alerts.length, 0); assert.equal(h.widgets.length, 1);
+  assert.ok(h.nodes.some(n => n.text === '+ Stick'));
+  assert.ok(h.nodes.some(n => n.text === '+ Cigarette'));
+  assert.equal([...h.files.keys()].filter(p => p.startsWith('/docs/PauseData-v1/journal/') && p.endsWith('.json')).length, 0);
+});
 
 test('generated single-file script parses and renders empty medium widget without records', async () => {
   const h = host(new Map(), {}, 'medium'); await h.run();
@@ -64,6 +75,38 @@ test('widget links launch correct action; app run saves before opening dashboard
   assert.equal(h.html.length, 1); assert.ok(h.html[0].includes('Stick logged'));
   assert.ok(h.nodes.some(n => n.url && n.url.includes('action=log&product=cigarette')));
   const reopen = host(files); await reopen.run(); assert.equal(readLogs(files).length, 1);
+});
+
+test('Night widget shows real product counts and a native relative date without adding entries', async () => {
+  const files = new Map();
+  await host(files, { action: 'log', product: 'stick' }).run();
+  await host(files, { action: 'log', product: 'stick' }).run();
+  await host(files, { action: 'log', product: 'cigarette' }).run();
+  const before = [...files];
+  const h = host(files, {}, 'medium'); await h.run();
+  assert.ok(h.nodes.some(n => n.text === '3 today'));
+  for (const [product, count] of [['stick', 2], ['cigarette', 1]]) {
+    const button = h.nodes.find(n => n.url && n.url.includes('action=log&product=' + product));
+    assert.ok(button);
+    const descendants = n => [n, ...n.children.flatMap(descendants)];
+    assert.ok(descendants(button).some(n => n.text === count + ' today'));
+  }
+  const date = h.nodes.find(n => n.date);
+  assert.equal(date.date.toISOString(), readLogs(files)[0].occurredAt);
+  assert.equal(date.relative, true);
+  assert.deepEqual([...files], before);
+});
+
+test('single-product Night widget hides the other action but keeps total recorded use', async () => {
+  const files = new Map();
+  await host(files, { action: 'log', product: 'cigarette' }).run();
+  await host(files, {}, null, '', [
+    { id: 'settings', type: 'command', payload: { kind: 'settings', payload: { products: ['stick'] } } }
+  ]).run();
+  const h = host(files, {}, 'medium'); await h.run();
+  assert.ok(h.nodes.some(n => n.text === '1 today'));
+  assert.ok(h.nodes.some(n => n.text === '+ Stick'));
+  assert.ok(!h.nodes.some(n => n.text === '+ Cigarette'));
 });
 test('two quick launches keep both records and stale undo removes the addressed one', async () => {
   const files = new Map();
