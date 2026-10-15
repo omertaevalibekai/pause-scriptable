@@ -1,6 +1,8 @@
 # Pause — alpha
 
-**Version 0.1.0-alpha.3 · Experimental — iPhone testing pending.**
+**Version 0.1.0-alpha.4 · Experimental — iPhone testing pending.**
+
+This update removes the extra five-minute minimum refresh delay. The dashboard supplies a fresh widget after each saved action and again when dismissed. Close the dashboard with Done before returning Home so the script can finish. This does not force iOS to redraw immediately; refresh timing still requires device testing.
 
 The Home Screen widget now uses the A3 / Night design: a matte dark surface, prominent time since the last entry, and two charcoal logging buttons with per-product counts. The medium widget keeps Undo and craving support in the dashboard; the large widget also has direct shortcuts. Relative time uses iOS date rendering and may follow the device locale. Counts and the dated Updated footer reflect the last widget refresh.
 
