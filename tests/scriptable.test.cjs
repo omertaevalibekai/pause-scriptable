@@ -144,6 +144,10 @@ test('dashboard bridge saves multiple actions and acknowledges latest persisted 
   ]);
   await h.run(); assert.equal(readLogs(h.files).length, 2);
   assert.ok(h.replies.some(js => js.startsWith('window.__pauseReply("log2",') && js.includes('cigarette')));
+  const descendants = n => [n, ...n.children.flatMap(descendants)];
+  const finalWidget = h.widgets.at(-1);
+  assert.ok(descendants(finalWidget).some(n => n.text === '2 today'));
+  assert.ok(h.widgets.every(w => w.refreshAfterDate.getTime() <= Date.now()), 'saved entries must not impose a future refresh floor');
 });
 test('dashboard bridge returns validation errors without a false success record', async () => {
   const h = host(new Map(), {}, null, '', [
