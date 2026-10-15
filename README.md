@@ -1,10 +1,10 @@
 # Pause — alpha
 
-**Version 0.1.0-alpha.4 · Experimental — iPhone testing pending.**
+**Version 0.1.0-alpha.5 · Experimental — iPhone testing pending.**
 
 This update removes the extra five-minute minimum refresh delay. The dashboard supplies a fresh widget after each saved action and again when dismissed. Close the dashboard with Done before returning Home so the script can finish. This does not force iOS to redraw immediately; refresh timing still requires device testing.
 
-The Home Screen widget now uses the A3 / Night design: a matte dark surface, prominent time since the last entry, and two charcoal logging buttons with per-product counts. The medium widget keeps Undo and craving support in the dashboard; the large widget also has direct shortcuts. Relative time uses iOS date rendering and may follow the device locale. Counts and the dated Updated footer reflect the last widget refresh.
+The Home Screen widget uses the A3 / Night design: a matte dark surface, prominent time since the last entry, and two charcoal logging buttons with per-product counts. The medium widget keeps Undo and craving support in the dashboard; the large widget also has direct shortcuts. All widget labels are English. Elapsed time uses a native numeric timer (for example 12:34 or 1:12:34), avoiding localized unit words while continuing to advance between widget refreshes. The footer uses an explicit English date format. Counts and the dated Updated footer reflect the last widget refresh.
 
 To enable automatic updates, replace the full code of your existing **Pause** script with [Pause-Auto.js](Pause-Auto.js), keep its name **Pause**, and run it once. Existing installations cannot update themselves until this one-time replacement. The journal is stored separately and is preserved. The browser preview shows the dashboard, not the native widget.
 
